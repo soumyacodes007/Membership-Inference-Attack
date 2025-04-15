@@ -1,38 +1,106 @@
-# Data Privacy Challenge: Membership Inference Attack (SBH2025)
+# Membership Inference Attack & Differential Privacy Study
 
-## Overview
-This project demonstrates a **Membership Inference Attack (MIA)** on the UCI Adult Income dataset (~45,222 rows, 14 features) for the **Data Privacy Challenge (SBH2025)**, hosted by Entiovi Technologies. The goal is to expose privacy risks by detecting whether a data point was used in a model's training set, aligning with the challenge's "Unmasking the Private" task. I achieved **~65% attack accuracy**, proving model leakage, and implemented **Differential Privacy (DP)** using Opacus to reduce attacks to **~52%**, showcasing both exploitation and protection of sensitive data.
+## Project Overview
+This project demonstrates the implementation of a Membership Inference Attack (MIA) on the UCI Adult Income dataset, followed by privacy protection using Differential Privacy (DP). The work explores both the vulnerability and protection aspects of machine learning models, achieving:
+- 62.76% MIA accuracy on non-DP model
+- 83.16% model accuracy with DP protection
+- ε=2.68 privacy budget (δ=1e-5)
 
-### Key Features
-- **Dataset**: UCI Adult Income (binary classification: >50K vs. <=50K).
-- **MIA**: Trained 4 shadow models, used loss features to hit ~65% accuracy.
-- **DP**: Opacus with ε=2.68, achieving ~82% model accuracy and ~52% attack accuracy.
-- **Visuals**: Confusion matrix, confidence/loss histograms, DP comparison.
+## Dataset
+- **Source**: UCI Adult Income dataset
+- **Size**: ~45,222 rows, 14 features
+- **Task**: Binary classification (income >50K vs ≤50K)
+- **Split**: 60% training (~27,132 samples), 20% validation, 20% test
 
-## Results
-- **Target Model**: ~85% test accuracy (non-DP neural network).
-- **MIA**:
-  - Non-DP: ~65% attack accuracy, exposing training data leakage.
-  - DP: ~52% attack accuracy, showing effective privacy defense.
-- **Visuals**:
-  - Confusion Matrix: Highlights attack performance.
-  - Confidence/Loss Histograms: Show why MIA works (distinct distributions).
-  - DP Comparison: Bar chart (non-DP 65% vs. DP 52%).
+## Methodology
 
-![Confusion Matrix](confusion_matrix.png)
-![Confidence Histogram](confidence_histogram.png)
-![Loss Histogram](loss_histogram.png)
-![DP Comparison](dp_comparison.png)
+### Data Preprocessing
+- Handled missing values (replaced '?' with NaN, dropped incomplete rows)
+- Standardized income labels
+- Applied LabelEncoder for categorical features
+- Used StandardScaler for numerical features
+
+### Target Model Architecture
+```python
+Sequential:
+- Dense(128, ReLU)
+- Dense(64, ReLU)
+- Dense(32, ReLU)
+- Dense(1, sigmoid)
+```
+- Optimizer: Adam
+- Loss: Binary Cross-Entropy
+- Training: 100 epochs
+- Performance: ~85% test accuracy
+
+### Membership Inference Attack
+- Implemented 4 shadow models
+- Features: Class probabilities and per-sample loss
+- Attack Model: LogisticRegression
+- Results:
+  - Accuracy: 62.76%
+  - Precision: 75.19%
+  - Recall: 75.14%
+
+### Differential Privacy Implementation
+- Framework: Opacus (PyTorch)
+- Configuration:
+  - Target ε: 3.0
+  - Achieved ε: 2.68
+  - δ: 1e-5
+  - Batch size: 256
+  - Epochs: 20
+  - Max gradient norm: 1.0
+- Results:
+  - Model Accuracy: 83.16%
+  - Attack Accuracy: 66.10%
+
+## Results & Visualizations
+The project includes several visualizations:
+- Confusion Matrix for attack performance
+- Confidence distribution histograms
+- Loss distribution histograms
+- DP vs Non-DP comparison charts
+
+## Key Findings
+1. Successfully demonstrated model vulnerability through MIA
+2. Achieved practical privacy-utility trade-off with DP
+3. Identified areas for improvement in DP implementation
 
 ## Prerequisites
-- Python 3.8+
-- Libraries (see `requirements.txt`):
-  - `tensorflow==2.5.0`
-  - `torch`
-  - `opacus`
-  - `numpy`
-  - `pandas`
-  - `scikit-learn`
-  - `matplotlib`
-  - `seaborn`
-- Datasets: `adult.csv`, `test.csv` (included in repo, from UCI Adult Income).
+```
+Python 3.8+
+tensorflow==2.5.0
+torch
+opacus
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+```
+
+## Installation & Usage
+1. Clone the repository
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+3. Ensure dataset files (`adult.csv`, `test.csv`) are in the project directory
+4. Run the main scripts for:
+   - Target model training
+   - MIA implementation
+   - DP model training
+
+## Future Work
+- Explore stricter privacy budgets (ε=1.0)
+- Implement additional regularization techniques
+- Test adversarial training approaches
+- Optimize DP implementation for better privacy-utility balance
+
+## License
+[Insert License Information]
+
+## Acknowledgments
+- UCI Machine Learning Repository for the Adult Income dataset
+- Opacus team for the DP implementation framework
