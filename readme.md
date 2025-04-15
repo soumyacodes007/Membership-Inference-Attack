@@ -138,8 +138,7 @@ pip install -r requirements.txt
 - Test adversarial training approaches
 - Optimize DP implementation for better privacy-utility balance
 
-## License
-[Insert License Information]
+
 
 ## Acknowledgments
 - UCI Machine Learning Repository for the Adult Income dataset
